@@ -5,9 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Task Management Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .container{
+    width:80%;
+    margin:auto
+  }
+  @media( max-width:768px){
+    .container{
+        width:95%;
+    }
+  }
+  @media(max-width:480px){
+    .container{
+        width:100%;
+        padding:10px;
+    }
+  }
+  </style>
 </head>
 <body class="bg-gray-100 p-4"> 
-  <h1 class="flex justify-center font-bold mb-6 text-xl">Task Management Dashboard</h1>
+  <h1 class="flex justify-center font-bold mb-6 text-2xl">Task Management Dashboard</h1>
+<!-- Dashboard Summary -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-center">
+  <div class="bg-white p-4 rounded shadow">
+    <h2 class="font-bold">Pending</h2>
+    <p id="pendingCount" class="text-2xl">0</p>
+  </div>
+  <div class="bg-white p-4 rounded shadow">
+    <h2 class="font-bold">Completed</h2>
+    <p id="completedCount" class="text-2xl">0</p>
+  </div>
+  <div class="bg-white p-4 rounded shadow">
+    <h2 class="font-bold">Deleted</h2>
+    <p id="deletedCount" class="text-2xl">0</p>
+  </div>
+</div>
+
+<!-- Filter -->
+<div class="flex justify-end mb-4">
+  <select id="filterSelect" class="p-2 border rounded">
+    <option value="all">All Tasks</option>
+    <option value="pending">Pending</option>
+    <option value="completed">Completed</option>
+  </select>
+</div>
 
   <!-- Task Form -->
   <form id="taskForm" class="flex flex-col sm:flex-row justify-center mb-6 gap-2">
@@ -42,6 +83,7 @@
     </table>
   </div>
 
+  
   <script src="Task.js"></script>
 </body>
 </html>
