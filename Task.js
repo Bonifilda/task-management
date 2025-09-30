@@ -1,34 +1,50 @@
-// ====== TASK MANAGER JS ======
-
+// Load tasks from localStorage or start empty
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let filter = "all";
 
 // DOM Elements
 const taskForm = document.getElementById("taskForm");
 const taskInput = document.getElementById("taskInput");
+const calendarInput = document.getElementById("calender"); 
 const taskBody = document.getElementById("taskBody");
 const pendingCountEl = document.getElementById("pendingCount");
 const completedCountEl = document.getElementById("completedCount");
 const allCountEl = document.getElementById("allCount");
 const filterSelect = document.getElementById("filterSelect");
 
+// Escape helper (avoid HTML injection when rendering task name)
+function escapeHtml(str) {
+  if (!str) return "";
+  return str
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 // Add Task
 taskForm.addEventListener("submit", function(e) {
   e.preventDefault();
   const taskText = taskInput.value.trim();
+  const taskDate = calendarInput.value || new Date().toLocaleDateString();
+
   if (taskText === "") {
     alert("Please enter a task!");
     return;
   }
+
   const newTask = {
     id: Date.now(),
     name: taskText,
-    date: new Date().toLocaleString(),
+    date: taskDate,
     status: "Pending"
   };
+
   tasks.push(newTask);
   saveTasks();
   taskInput.value = "";
+  calendarInput.value = "";
   renderTasks();
 });
 
@@ -38,21 +54,22 @@ function renderTasks() {
 
   let filteredTasks = tasks;
   if (filter === "pending") {
-    filteredTasks = tasks.filter(t => t.status === "Pending");
+    filteredTasks = tasks.filter(t => (t.status || "").toLowerCase() === "pending");
   } else if (filter === "completed") {
-    filteredTasks = tasks.filter(t => t.status === "Completed");
+    filteredTasks = tasks.filter(t => (t.status || "").toLowerCase() === "completed");
   }
 
   filteredTasks.forEach((task, index) => {
-    const row = document.createElement("tr");
+    const isCompleted = (task.status || "").toLowerCase() === "completed";
 
+    const row = document.createElement("tr");
     row.innerHTML = `
       <td class="py-2 px-4 border">${index + 1}</td>
-      <td class="py-2 px-4 border ${task.status === "Completed" ? "line-through text-gray-500" : ""}">
-        ${task.name}
+      <td class="py-2 px-4 border ${isCompleted ? 'completed' : ''}">
+        ${escapeHtml(task.name)}
       </td>
-      <td class="py-2 px-4 border">${task.date}</td>
-      <td class="py-2 px-4 border">${task.status}</td>
+      <td class="py-2 px-4 border">${escapeHtml(task.date)}</td>
+      <td class="py-2 px-4 border">${escapeHtml(task.status)}</td>
       <td class="py-2 px-4 border space-x-2">
         <button class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-700"
           onclick="editTask(${task.id})">Edit</button>
@@ -60,7 +77,7 @@ function renderTasks() {
           onclick="deleteTask(${task.id})">Delete</button>
         <button class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-700"
           onclick="toggleComplete(${task.id})">
-          ${task.status === "Pending" ? "Complete" : "Undo"}
+          ${isCompleted ? "Undo" : "Complete"}
         </button>
       </td>
     `;
@@ -74,7 +91,7 @@ function renderTasks() {
 function toggleComplete(id) {
   tasks = tasks.map(task =>
     task.id === id
-      ? { ...task, status: task.status === "Pending" ? "Completed" : "Pending" }
+      ? { ...task, status: (task.status && task.status.toLowerCase() === "completed") ? "Pending" : "Completed" }
       : task
   );
   saveTasks();
@@ -84,6 +101,7 @@ function toggleComplete(id) {
 // Edit Task
 function editTask(id) {
   const task = tasks.find(t => t.id === id);
+  if (!task) return;
   const newName = prompt("Edit task:", task.name);
   if (newName && newName.trim() !== "") {
     task.name = newName.trim();
@@ -103,28 +121,31 @@ function deleteTask(id) {
 
 // Update Dashboard Counts
 function updateDashboard() {
-  const pending = tasks.filter(t => t.status === "Pending").length;
-  const completed = tasks.filter(t => t.status === "Completed").length;
-  const all = tasks.length;
+  const pendingCount = tasks.filter(task => (task.status || "").toLowerCase() === "pending").length;
+  const completedCount = tasks.filter(task => (task.status || "").toLowerCase() === "completed").length;
+  const allCount = tasks.length;
 
-  pendingCountEl.textContent = pending;
-  completedCountEl.textContent = completed;
-  allCountEl.textContent = all;
+  pendingCountEl.textContent = pendingCount;
+  completedCountEl.textContent = completedCount;
+  allCountEl.textContent = allCount;
 }
 
-// Filter Tasks
-filterSelect.addEventListener("change", function() {
-  filter = this.value;
-  renderTasks();
-});
-
-// Save Tasks to localStorage
+// Save tasks to localStorage
 function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-// Initialize
+// Filter tasks when dropdown changes
+filterSelect.addEventListener("change", function () {
+  filter = this.value;
+  renderTasks();
+});
+
+// Initial render on page load
 renderTasks();
+
+
+
 
 
 
