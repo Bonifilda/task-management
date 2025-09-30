@@ -1,41 +1,41 @@
-// Array to store tasks
-let tasks = [];
-let deletedCount = 0; // track deleted tasks
-let filter = "all"; // all | pending | completed
+// ====== TASK MANAGER JS ======
 
-// Select DOM elements
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let filter = "all";
+
+// DOM Elements
 const taskForm = document.getElementById("taskForm");
 const taskInput = document.getElementById("taskInput");
 const taskBody = document.getElementById("taskBody");
 const pendingCountEl = document.getElementById("pendingCount");
 const completedCountEl = document.getElementById("completedCount");
-const deletedCountEl = document.getElementById("deletedCount");
+const allCountEl = document.getElementById("allCount");
 const filterSelect = document.getElementById("filterSelect");
 
-// Handle form submit
-taskForm.addEventListener("submit", function (e) {
+// Add Task
+taskForm.addEventListener("submit", function(e) {
   e.preventDefault();
-
   const taskText = taskInput.value.trim();
-  if (taskText === "") return;
-
+  if (taskText === "") {
+    alert("Please enter a task!");
+    return;
+  }
   const newTask = {
     id: Date.now(),
     name: taskText,
     date: new Date().toLocaleString(),
     status: "Pending"
   };
-
   tasks.push(newTask);
+  saveTasks();
   taskInput.value = "";
   renderTasks();
 });
 
-// Render tasks in table
+// Render Tasks
 function renderTasks() {
   taskBody.innerHTML = "";
 
-  // filter tasks
   let filteredTasks = tasks;
   if (filter === "pending") {
     filteredTasks = tasks.filter(t => t.status === "Pending");
@@ -48,67 +48,94 @@ function renderTasks() {
 
     row.innerHTML = `
       <td class="py-2 px-4 border">${index + 1}</td>
-      <td class="py-2 px-4 border">${task.name}</td>
+      <td class="py-2 px-4 border ${task.status === "Completed" ? "line-through text-gray-500" : ""}">
+        ${task.name}
+      </td>
       <td class="py-2 px-4 border">${task.date}</td>
       <td class="py-2 px-4 border">${task.status}</td>
-      <td class="py-2 px-4 space-x-2 border">
-        <button class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-700"
-          onclick="markComplete(${task.id})">Complete</button>
+      <td class="py-2 px-4 border space-x-2">
         <button class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-700"
           onclick="editTask(${task.id})">Edit</button>
         <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700"
           onclick="deleteTask(${task.id})">Delete</button>
+        <button class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-700"
+          onclick="toggleComplete(${task.id})">
+          ${task.status === "Pending" ? "Complete" : "Undo"}
+        </button>
       </td>
     `;
-
     taskBody.appendChild(row);
   });
 
   updateDashboard();
 }
 
-// Mark task as complete
-function markComplete(id) {
-  tasks = tasks.map(task => 
-    task.id === id ? {...task, status: "Completed"} : task
+// Toggle Complete / Undo
+function toggleComplete(id) {
+  tasks = tasks.map(task =>
+    task.id === id
+      ? { ...task, status: task.status === "Pending" ? "Completed" : "Pending" }
+      : task
   );
+  saveTasks();
   renderTasks();
 }
 
-// Edit task
+// Edit Task
 function editTask(id) {
   const task = tasks.find(t => t.id === id);
   const newName = prompt("Edit task:", task.name);
   if (newName && newName.trim() !== "") {
     task.name = newName.trim();
+    saveTasks();
     renderTasks();
   }
 }
 
-// Delete task
+// Delete Task
 function deleteTask(id) {
-  tasks = tasks.filter(task => {
-    if (task.id === id) {
-      deletedCount++;
-      return false;
-    }
-    return true;
-  });
-  renderTasks();
+  if (confirm("Are you sure you want to delete this task?")) {
+    tasks = tasks.filter(task => task.id !== id);
+    saveTasks();
+    renderTasks();
+  }
 }
 
-// Update dashboard counts
+// Update Dashboard Counts
 function updateDashboard() {
   const pending = tasks.filter(t => t.status === "Pending").length;
   const completed = tasks.filter(t => t.status === "Completed").length;
+  const all = tasks.length;
 
   pendingCountEl.textContent = pending;
   completedCountEl.textContent = completed;
-  deletedCountEl.textContent = deletedCount;
+  allCountEl.textContent = all;
 }
 
-// Handle filter change
-filterSelect.addEventListener("change", function () {
+// Filter Tasks
+filterSelect.addEventListener("change", function() {
   filter = this.value;
   renderTasks();
 });
+
+// Save Tasks to localStorage
+function saveTasks() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+// Initialize
+renderTasks();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
