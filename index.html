@@ -1,90 +1,72 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Task Management Dashboard</title>
+  <title>Responsive Task Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .completed {
-  text-decoration: line-through;
-  opacity: 0.5;
-}
-
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
   </style>
 </head>
-<body class="bg-gray-100 p-4"> 
-  <!-- Container with responsive width -->
-  <div class="w-full sm:w-11/12 md:w-4/5 mx-auto px-2">
+<body class="bg-gray-100 p-4">
 
-    <!-- Title -->
-    <h1 class="flex justify-center font-bold mb-6 text-2xl text-center">
-      Task Management Dashboard
-    </h1>
+  <div class="container mx-auto">
+    <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center md:text-left">Task Management Dashboard</h1>
 
-    <!-- Dashboard Summary -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-center">
-      <div class="bg-white p-4 rounded shadow">
-        <h2 class="font-bold">Pending</h2>
-        <p id="pendingCount" class="text-2xl">0</p>
+    <!-- Task Form -->
+    <form id="taskForm" class="mb-6 flex flex-col md:flex-row gap-2">
+      <input type="text" id="taskInput" placeholder="Task name" class="border p-2 rounded flex-1" />
+      <input type="date" id="taskDate" class="border p-2 rounded" />
+      <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">
+        Add Task
+      </button>
+    </form>
+
+    <!-- Dashboard Counters -->
+    <div class="mb-6 flex flex-wrap gap-4">
+      <div class="bg-white p-4 rounded shadow flex-1 min-w-[120px] text-center">
+        Pending: <span id="pendingCount">0</span>
       </div>
-      <div class="bg-white p-4 rounded shadow">
-        <h2 class="font-bold">Completed</h2>
-        <p id="completedCount" class="text-2xl">0</p>
+      <div class="bg-white p-4 rounded shadow flex-1 min-w-[120px] text-center">
+        Completed: <span id="completedCount">0</span>
       </div>
-      <div class="bg-white p-4 rounded shadow">
-        <h2 class="font-bold">All Tasks</h2>
-        <p id="allCount" class="text-2xl">0</p>
+      <div class="bg-white p-4 rounded shadow flex-1 min-w-[120px] text-center">
+        All: <span id="allCount">0</span>
       </div>
     </div>
 
     <!-- Filter -->
-    <div class="flex justify-end mb-4">
-      <select id="filterSelect" class="p-2 border rounded">
-        <option value="all">All Tasks</option>
+    <div class="mb-4">
+      <label for="filterSelect" class="mr-2 font-semibold">Filter:</label>
+      <select id="filterSelect" class="border p-2 rounded">
+        <option value="all">All</option>
         <option value="pending">Pending</option>
         <option value="completed">Completed</option>
       </select>
     </div>
 
-    <!-- Task Form -->
-    <form id="taskForm" class="flex flex-col sm:flex-row justify-center mb-6 gap-2">
-      <input 
-        type="text" 
-        id="taskInput" 
-        placeholder="Enter your task" 
-        class="p-2 border border-gray-300 rounded w-full sm:w-1/2"
-        required
-      >
-      <input type="date" id="calender"  placeholder="enter your date"   class="p-2 border border-gray-300  rounded w-full sm:-1/2" >
-      <button 
-        type="submit" 
-        class="p-2 bg-black text-white rounded hover:bg-green-600"
-      >Add Task</button>
-    </form>
-
-    <!-- Task Table -->
+    <!-- Task Table with horizontal scroll on small screens -->
     <div class="overflow-x-auto">
-      <table id="taskTable" class="min-w-full bg-white shadow rounded-lg overflow-hidden">
-        <thead class="bg-gray-200">
-          <tr>
-            <th class="py-2 px-4 text-left">#</th>
-            <th class="py-2 px-4 text-left">Task</th>
-            <th class="py-2 px-4 text-left">Date Added</th>
-            <th class="py-2 px-4 text-left">Status</th>
-            <th class="py-2 px-4 text-left">Actions</th> 
+      <table class="w-full border-collapse min-w-[600px]">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="py-2 px-4 border">#</th>
+            <th class="py-2 px-4 border">Task</th>
+            <th class="py-2 px-4 border">Date</th>
+            <th class="py-2 px-4 border">Status</th>
+            <th class="py-2 px-4 border">Actions</th>
           </tr>
         </thead>
-        <tbody id="taskBody">
-          <!-- Dynamic rows will appear here -->
-        </tbody>
+        <tbody id="taskBody"></tbody>
       </table>
     </div>
-
   </div>
-  
-  <script src="Task.js"></script>
+
+  <!-- JS -->
+  <script src="task.js"></script>
 </body>
 </html>
-
-
