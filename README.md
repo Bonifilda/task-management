@@ -25,4 +25,4 @@ The **Task Management Dashboard** is a simple, responsive web application to man
    Right-click → Open with → Browser
    
  ## Deployed Link
- You can view the live project here: 
+ You can view the live project here: https://sparkly-sundae-97aea3.netlify.app/
